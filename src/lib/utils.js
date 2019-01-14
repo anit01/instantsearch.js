@@ -26,6 +26,7 @@ export {
   isReactElement,
   deprecate,
   warn,
+  createDocumentationMessageGenerator,
   aroundLatLngToPosition,
   insideBoundingBoxToBoundingBox,
 };
@@ -368,7 +369,9 @@ function unescapeRefinement(value) {
 
 function checkRendering(rendering, usage) {
   if (rendering === undefined || typeof rendering !== 'function') {
-    throw new Error(usage);
+    throw new Error(`The render function is not valid (got type "${typeof rendering}").
+
+${usage}`);
   }
 }
 
@@ -491,4 +494,20 @@ function insideBoundingBoxToBoundingBox(value) {
   }
 
   return insideBoundingBoxStringToBoundingBox(value);
+}
+
+function createDocumentationMessageGenerator(
+  widget,
+  { connector = false } = {}
+) {
+  const link = [
+    'https://www.algolia.com/doc/api-reference/widgets/',
+    widget,
+    '/js/',
+    connector ? '#connector' : '',
+  ].join('');
+
+  return function(message) {
+    return [message, `See documentation: ${link}`].filter(Boolean).join('\n\n');
+  };
 }
